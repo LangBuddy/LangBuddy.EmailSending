@@ -1,26 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { CreateEmailSenderDto } from './dto/create-email-sender.dto';
-import { UpdateEmailSenderDto } from './dto/update-email-sender.dto';
+import { MailerService } from '@nestjs-modules/mailer';
+import { EmailBodyRequest } from './request/email-body.request';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class EmailSenderService {
-  create(createEmailSenderDto: CreateEmailSenderDto) {
-    return 'This action adds a new emailSender';
-  }
+  constructor(
+    private readonly mailService: MailerService,
+    private readonly config: ConfigService,
+  ) {}
 
-  findAll() {
-    return `This action returns all emailSender`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} emailSender`;
-  }
-
-  update(id: number, updateEmailSenderDto: UpdateEmailSenderDto) {
-    return `This action updates a #${id} emailSender`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} emailSender`;
+  async sendEmail(emailBodyRequest: EmailBodyRequest) {
+    const response = await this.mailService.sendMail({
+      to: emailBodyRequest.to,
+      from: this.config.get('MAIL_FROM'),
+      subject: emailBodyRequest.subject,
+      text: emailBodyRequest.text,
+    });
+    return response;
   }
 }
